@@ -19,8 +19,10 @@ class ResumeSeeder extends Seeder
             'address' => 'Bolo, Bauan, Batangas',
             'phone' => '09944639633',
             'profile_image' => 'images/profile.jpg',
-            'skills' => json_encode(['MySQL','PostgreSQL','SQL Server']),
-            'education' => json_encode([
+            
+            // FIX: Removed json_encode() calls. Data is now a native PHP array.
+            'skills' => ['MySQL','PostgreSQL','SQL Server'], 
+            'education' => [
                 [
                     'level' => 'College',
                     'school' => 'Batangas State University - Alangilan',
@@ -28,11 +30,11 @@ class ResumeSeeder extends Seeder
                     'course' => 'BS Computer Science',
                     'relevant' => ['Data Structures','Data Analysis','Cloud Computing']
                 ]
-            ]),
-            'experience' => json_encode([
+            ],
+            'experience' => [
                 ['project' => 'Ambag App', 'description' => 'Developed an expense tracker app.'],
                 ['project' => 'Immunization Tracker', 'description' => 'Built an OOP-based tracker in Java.']
-            ])
+            ]
         ]);
     }
 }

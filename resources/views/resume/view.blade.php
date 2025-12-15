@@ -28,22 +28,31 @@
 
         <h2>Skills</h2>
         <ul>
-            @foreach($resume->skills as $skill)
-                <li>{{ $skill }}</li>
-            @endforeach
+            {{-- FIX: Added check to ensure $resume->skills is a valid array before looping --}}
+            @if(is_array($resume->skills))
+                @foreach($resume->skills as $skill)
+                    <li>{{ $skill }}</li>
+                @endforeach
+            @endif
         </ul>
 
         <h2>Education</h2>
-        @foreach($resume->education as $edu)
-            <p><strong>{{ $edu['level'] }} - {{ $edu['school'] }} ({{ $edu['year'] }})</strong></p>
-            <p>Course: {{ $edu['course'] }}</p>
-            <p>Relevant: {{ implode(', ', $edu['relevant']) }}</p>
-        @endforeach
+        {{-- FIX: Added check to ensure $resume->education is a valid array before looping --}}
+        @if(is_array($resume->education))
+            @foreach($resume->education as $edu)
+                <p><strong>{{ $edu['level'] }} - {{ $edu['school'] }} ({{ $edu['year'] }})</strong></p>
+                <p>Course: {{ $edu['course'] }}</p>
+                <p>Relevant: {{ implode(', ', $edu['relevant']) }}</p>
+            @endforeach
+        @endif
 
         <h2>Experience</h2>
-        @foreach($resume->experience as $exp)
-            <p><strong>{{ $exp['project'] }}</strong>: {{ $exp['description'] }}</p>
-        @endforeach
+        {{-- FIX: Added check to ensure $resume->experience is a valid array before looping --}}
+        @if(is_array($resume->experience))
+            @foreach($resume->experience as $exp)
+                <p><strong>{{ $exp['project'] }}</strong>: {{ $exp['description'] }}</p>
+            @endforeach
+        @endif
     </div>
 </div>
 @endsection

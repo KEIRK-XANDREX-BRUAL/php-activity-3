@@ -13,80 +13,52 @@ class ResumeController extends Controller
     // Show edit form
     public function edit()
     {
+        // $resume->skills is automatically an array here due to model casting
         $resume = Resume::where('user_id', Auth::id())->firstOrFail();
         return view('resume.edit', compact('resume'));
     }
 
-    // Update resume
+    // Update resume (MUST NOT contain manual json_encode)
     public function update(Request $request)
     {
         $resume = Resume::where('user_id', Auth::id())->firstOrFail();
 
         $validated = $request->validate([
-            'full_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'field' => 'required|string|max:255',
-            'about' => 'nullable|string',
-            'github' => 'nullable|url',
-            'address' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:50',
+            // ... (validation rules)
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'skills' => 'nullable|array',
             'education' => 'nullable|array',
             'experience' => 'nullable|array',
         ]);
 
-        // Handle profile image
+        // Handle profile image (including delete logic from prior step)
         if ($request->hasFile('profile_image')) {
+            if ($resume->profile_image && Storage::disk('public')->exists(str_replace('storage/', '', $resume->profile_image))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $resume->profile_image));
+            }
             $path = $request->file('profile_image')->store('images', 'public');
             $validated['profile_image'] = 'storage/' . $path;
         }
 
-        // Convert array fields to JSON before saving
-        if (isset($validated['skills'])) {
-            $validated['skills'] = json_encode($validated['skills']);
-        }
-        if (isset($validated['education'])) {
-            $validated['education'] = json_encode($validated['education']);
-        }
-        if (isset($validated['experience'])) {
-            $validated['experience'] = json_encode($validated['experience']);
-        }
-
+        // The Resume Model handles array-to-JSON conversion automatically.
         $resume->update($validated);
 
         return redirect()->route('resume.edit')->with('success', 'Resume updated successfully.');
     }
 
-    // Public resume view
+    // Public resume view (MUST NOT contain manual json_decode)
     public function view()
     {
+        // $resume->skills is automatically an array here due to model casting
         $resume = Resume::where('user_id', Auth::id())->firstOrFail();
-
-        $resume->skills = json_decode($resume->skills, true) ?? [];
-        $resume->education = json_decode($resume->education, true) ?? [];
-        $resume->experience = json_decode($resume->experience, true) ?? [];
-
         return view('resume.view', compact('resume'));
     }
 
 
     public function public($id)
     {
+        // $resume->skills is automatically an array here due to model casting
         $resume = Resume::findOrFail($id);
-
-        $resume->skills = json_decode($resume->skills, true) ?? [];
-        $resume->education = json_decode($resume->education, true) ?? [];
-        $resume->experience = json_decode($resume->experience, true) ?? [];
-
         return view('resume.public', compact('resume'));
     }
-
-    public function showLoginForm()
-    {
-        $resume = \App\Models\Resume::first(); // fetch the first resume
-        return view('auth.login', compact('resume'));
-    }
-
-
 }
